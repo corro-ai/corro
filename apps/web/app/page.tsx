@@ -65,7 +65,7 @@ export default function LandingPage() {
             <Terminal className="w-10 h-10 text-indigo-400 mb-6" />
             <h3 className="text-xl font-semibold mb-3">MCP Live Contract</h3>
             <p className="text-slate-400 leading-relaxed">
-              When Cursor or Claude builds your feature, they can query the Corro MCP server to ask "Why does this requirement exist?"
+              When Cursor or Claude builds your feature, they can query the Corro MCP server to ask &quot;Why does this requirement exist?&quot;
             </p>
           </div>
         </div>
