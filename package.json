@@ -1,0 +1,14 @@
+{
+  "name": "corro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The open-source evidence layer for spec-driven development.",
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
