@@ -8,6 +8,7 @@
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint"
   },
+  "packageManager": "pnpm@9.1.0",
   "devDependencies": {
     "typescript": "^5.4.5"
   }
