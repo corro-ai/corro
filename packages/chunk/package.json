@@ -1,0 +1,16 @@
+{
+  "name": "@corro/chunk",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@corro/ingest": "workspace:*",
+    "@supabase/supabase-js": "^2.43.4",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}
