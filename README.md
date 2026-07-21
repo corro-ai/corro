@@ -25,7 +25,27 @@ We publish our eval scores on every release. Trust is the product.
 
 ## Quickstart
 
-*(Coming soon — run `corro ingest ./calls/*.vtt && corro report`)*
+Right now, Corro supports the first step of the pipeline: **Ingestion**. You can upload Zoom transcripts (`.vtt`, `.srt`), plain text (`.txt`, `.docx`), or raw audio (`.mp3`, `.mp4`) and we will parse it into context-aware chunks saved to Supabase.
+
+1. Clone the repo and install dependencies:
+   ```bash
+   git clone https://github.com/corro-ai/corro.git
+   cd corro
+   pnpm install
+   ```
+
+2. Set up your `.env` file with your Supabase and Groq keys.
+
+3. Generate a UUID for your project:
+   ```bash
+   uuidgen
+   # Example: 6AC3C351-8D82-4CDD-97C4-65BD2D5BC881
+   ```
+
+4. Run the ingestion pipeline using the sample transcript:
+   ```bash
+   pnpm --filter @corro/cli corro ingest ./examples/product_feedback_call.vtt --project "<YOUR-UUID>"
+   ```
 
 ## Roadmap
 
