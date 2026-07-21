@@ -1,0 +1,21 @@
+{
+  "name": "@corro/cli",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "corro": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@corro/ingest": "workspace:*",
+    "@corro/transcribe": "workspace:*",
+    "@corro/chunk": "workspace:*",
+    "commander": "^12.1.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2",
+    "tsx": "^4.19.0"
+  }
+}
