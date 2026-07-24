@@ -11,5 +11,10 @@
   "packageManager": "pnpm@9.1.0",
   "devDependencies": {
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.4",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.19.0"
   }
 }

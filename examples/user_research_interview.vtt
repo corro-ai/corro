@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:02.000 --> 00:00:08.000
+Rahul: Hey Sneha thanks for taking the time. Can you walk me through how your team decides what features to prioritize?
+
+2
+00:00:09.500 --> 00:00:28.000
+Sneha: We do quarterly planning. I collect feedback from three sources. Customer support tickets, sales call notes, and my own user interviews. Then I put it all into a Notion doc and try to find patterns.
+
+3
+00:00:29.000 --> 00:00:40.000
+Rahul: How long does that process usually take?
+
+4
+00:00:41.000 --> 00:01:05.000
+Sneha: Too long. Last quarter it took me two full weeks just to go through all the notes and group them into themes. And even then I was not confident I caught everything. Some insights definitely fell through the cracks.
+
+5
+00:01:06.000 --> 00:01:18.000
+Rahul: When you say insights fell through the cracks, can you give me a specific example?
+
+6
+00:01:19.000 --> 00:01:45.000
+Sneha: Yes. We launched our API last month. After launch three different customers independently told us the error messages were confusing. But I only found out when a support ticket escalated. If I had caught that pattern during my research phase we could have fixed it before launch.
+
+7
+00:01:46.000 --> 00:02:00.000
+Rahul: What tools are you currently using for this research?
+
+8
+00:02:01.000 --> 00:02:25.000
+Sneha: Notion for notes, Google Sheets for tracking themes, and Dovetail for tagging. The problem is none of them talk to each other. I end up copying and pasting quotes between three different tools. It is a mess.
+
+9
+00:02:26.000 --> 00:02:38.000
+Rahul: If you could change one thing about this workflow what would it be?
+
+10
+00:02:39.000 --> 00:03:00.000
+Sneha: Automated pattern detection. I want to dump all my call recordings into one place and have it tell me the top five things customers are struggling with. With the actual quotes. Not AI summaries that make things up. I have been burned by ChatGPT hallucinating customer quotes before.

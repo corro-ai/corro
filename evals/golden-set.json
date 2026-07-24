@@ -1,0 +1,320 @@
+[
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Customer feedback is scattered across Slack and easily missed",
+    "quote": "we have a Slack channel where the support team drops customer complaints. I try to read it every morning but honestly I miss half of them"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Product decisions are based on memory rather than data",
+    "quote": "Mostly my memory. I remember the loudest complaints"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Built a feature based on one loud customer that nobody else wanted",
+    "quote": "we built a dashboard feature because one enterprise client kept asking for it. Turned out nobody else wanted it. We wasted three weeks of engineering time"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Engineering team lost trust in product decisions and demands evidence",
+    "quote": "He said show me the data, show me the customer quotes, stop coming to me with gut feelings"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Sprint planning feels adversarial due to lack of evidence",
+    "quote": "every sprint planning feels like a courtroom. I am the lawyer trying to convince the jury. But I have no evidence"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Nobody watches full call recordings to find relevant quotes",
+    "quote": "nobody watches a 45 minute recording"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Existing transcription tools produce unstructured walls of text",
+    "quote": "We tried Otter for transcription but it just gives you a wall of text. Finding the one quote I need takes longer than the original call"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Wants to upload a call and get pain points with exact quotes attached",
+    "quote": "I want to upload a Zoom call and get back a list of pain points with the exact customer quote attached"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Wants clickable links to the exact moment a customer described a problem",
+    "quote": "I can click a link and play the exact 30 seconds where the customer described the problem"
+  },
+  {
+    "source": "product_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Wants actual verbatim quotes not AI summaries",
+    "quote": "Not a summary. The actual words they said"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "pain",
+    "statement": "Quarterly feedback synthesis takes two full weeks of manual work",
+    "quote": "Last quarter it took me two full weeks just to go through all the notes and group them into themes"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "pain",
+    "statement": "Not confident all insights are captured during manual synthesis",
+    "quote": "I was not confident I caught everything. Some insights definitely fell through the cracks"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "pain",
+    "statement": "Missed a pattern of confusing API error messages that multiple customers reported independently",
+    "quote": "three different customers independently told us the error messages were confusing. But I only found out when a support ticket escalated"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "pain",
+    "statement": "Research tools are fragmented and do not integrate with each other",
+    "quote": "none of them talk to each other. I end up copying and pasting quotes between three different tools. It is a mess"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "request",
+    "statement": "Wants automated pattern detection across all call recordings",
+    "quote": "I want to dump all my call recordings into one place and have it tell me the top five things customers are struggling with"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "request",
+    "statement": "Wants real quotes not AI-generated summaries that hallucinate",
+    "quote": "With the actual quotes. Not AI summaries that make things up"
+  },
+  {
+    "source": "user_research_interview.vtt",
+    "kind": "pain",
+    "statement": "Has been burned by ChatGPT hallucinating customer quotes",
+    "quote": "I have been burned by ChatGPT hallucinating customer quotes before"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Team adoption is low despite six months of paying",
+    "quote": "we have been paying twelve hundred dollars a month for six months and I still cannot get my team to use it consistently"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Onboarding was confusing for the team",
+    "quote": "The onboarding was confusing, the UI keeps changing, and nobody on my team trusts the data it shows"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Analytics dashboard showed wildly inaccurate feature adoption numbers",
+    "quote": "the analytics dashboard showed us that feature adoption was at eighty percent. But when we manually checked, it was closer to thirty"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Wrong data ended up in a board presentation causing embarrassment",
+    "quote": "My VP saw the wrong number in a board deck. That was embarrassing"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Churn prediction model completely failed to identify at-risk accounts",
+    "quote": "the churn prediction model flagged zero risk accounts for three months straight while we were actually losing customers"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Support response times are unacceptably slow",
+    "quote": "The first ticket took eleven days to get a response"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Support replies are generic and do not address the actual problem",
+    "quote": "The second time we got a canned reply that did not address the problem"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Known bug was promised to be fixed but remains unfixed after four months",
+    "quote": "said it was a known issue that would be fixed in the next release. That was four months ago. Still not fixed"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "praise",
+    "statement": "Salesforce integration works seamlessly",
+    "quote": "The integration with Salesforce was actually great. That part was seamless"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "praise",
+    "statement": "Weekly email digest is simple, clear and useful",
+    "quote": "the weekly email digest that summarizes account health, my team loved that. Simple, clear, useful"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Pricing is too expensive for a product where half the features are unreliable",
+    "quote": "Twelve hundred a month for a team of five is steep when half the features do not work reliably"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "pain",
+    "statement": "Sales rep had no flexibility and felt impersonal during renewal negotiation",
+    "quote": "She kept reading from a script. That was the final straw. I felt like just another number"
+  },
+  {
+    "source": "churn_analysis_call.vtt",
+    "kind": "request",
+    "statement": "Wants per-seat pricing based on active users instead of rigid tier bundles",
+    "quote": "let us pay per seat. We have five users but only three are active. Why am I paying for seats nobody uses"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "No onboarding guidance after signup — dropped into dashboard with no tutorial",
+    "quote": "I was dropped into the dashboard with no guidance. There was no tutorial, no walkthrough, nothing"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "confusion",
+    "statement": "Documentation is written for developers not product managers",
+    "quote": "the docs but they are clearly written for developers. I am a product manager. When I see instructions like run this curl command in your terminal I close the tab"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Needs a simple drag and drop interface for uploading data",
+    "quote": "I need a simple drag and drop interface. Just let me upload a CSV and show me results"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "File upload failed silently with no error message or progress indicator",
+    "quote": "the upload failed silently. No error message, no progress bar, nothing. The screen just sat there"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Schema validation error did not specify which column was wrong",
+    "quote": "it gave me an error that said invalid schema but did not tell me which column was wrong. I had forty columns"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "praise",
+    "statement": "Support agent Kavita gave an excellent and fast response",
+    "quote": "Kavita replied within two hours with a screenshot showing exactly which columns needed to be renamed. She was fantastic"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "Should not need to email support just to upload a file",
+    "quote": "I should not need to email support just to upload a file"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "praise",
+    "statement": "Trend charts are beautiful and impressed the CEO",
+    "quote": "The trend charts are beautiful. I actually showed them to my CEO and she was impressed"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Needs chart export to PNG or PDF for board decks",
+    "quote": "I cannot export them. I need to put these charts into my monthly board deck and there is no export to PNG or PDF option"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "pain",
+    "statement": "No role-based access control — invited users can see billing and API keys",
+    "quote": "I invited my analyst to the workspace but she can see everything including billing information and API keys. There is no role-based access"
+  },
+  {
+    "source": "onboarding_feedback_call.vtt",
+    "kind": "request",
+    "statement": "Needs viewer role that hides sensitive settings",
+    "quote": "I need to be able to invite someone as a viewer without exposing sensitive settings"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "praise",
+    "statement": "Search functionality is the best among any SaaS tool used",
+    "quote": "The search functionality is the best I have used in any SaaS tool. I can find any customer conversation in seconds"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "praise",
+    "statement": "User actively refers the product to friends and colleagues",
+    "quote": "I have actually told three other PM friends about it and two of them signed up"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "pain",
+    "statement": "Mobile app feels like an afterthought with tiny text and hard-to-tap buttons",
+    "quote": "the mobile experience feels like an afterthought. Text is tiny, buttons are hard to tap, and the app crashes at least once a day"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "pain",
+    "statement": "Mobile app crashes daily and bug reports are ignored",
+    "quote": "the app crashes at least once a day. I have reported the crash three times and keep getting told it is on the roadmap"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "pain",
+    "statement": "Notification system is overwhelming with no way to customize preferences",
+    "quote": "I get notified about everything. Every comment, every tag, every status change. There is no way to customize notification preferences"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "request",
+    "statement": "Wants granular notification preferences to choose what to be notified about",
+    "quote": "Just let me choose what I want to be notified about"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "praise",
+    "statement": "Real-time collaboration on documents has replaced Google Docs entirely",
+    "quote": "The real-time collaboration on documents is incredible. We have completely replaced Google Docs for our product specs"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "praise",
+    "statement": "Linking specs to customer evidence is a killer feature no other tool offers",
+    "quote": "the fact that I can link specs to customer evidence is the killer feature. No other tool does that"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "request",
+    "statement": "Needs Jira integration so insights automatically sync as linked evidence",
+    "quote": "I need a Jira integration. Right now I manually copy insight summaries into Jira tickets"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "request",
+    "statement": "Wants an API to build custom dashboards combining product data with internal metrics",
+    "quote": "I want an API so I can build custom dashboards. Your built-in dashboards are fine but I need to combine your data with our internal metrics"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "confusion",
+    "statement": "Pricing page feature comparison is unclear when trying to upgrade",
+    "quote": "Your pricing page is confusing. I wanted to upgrade my team from the growth plan to the enterprise plan but the feature comparison table does not clearly explain what we would get"
+  },
+  {
+    "source": "power_user_interview.vtt",
+    "kind": "pain",
+    "statement": "Slow sales response caused a lost twelve thousand dollar upgrade deal",
+    "quote": "I emailed sales and they took five days to reply. By then my budget approval window had closed. You literally lost a twelve thousand dollar deal because your sales team was slow"
+  }
+]

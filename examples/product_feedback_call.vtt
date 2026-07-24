@@ -1,0 +1,49 @@
+WEBVTT
+
+1
+00:00:01.000 --> 00:00:06.000
+Priya: Thanks for joining this call Amit. I wanted to understand how you currently handle customer feedback.
+
+2
+00:00:07.500 --> 00:00:22.000
+Amit: Sure. So right now we have a Slack channel where the support team drops customer complaints. I try to read it every morning but honestly I miss half of them.
+
+3
+00:00:23.000 --> 00:00:35.000
+Priya: And when you are deciding what to build next, where do you go for that information?
+
+4
+00:00:36.000 --> 00:00:58.000
+Amit: Mostly my memory. I remember the loudest complaints. But last month we built a dashboard feature because one enterprise client kept asking for it. Turned out nobody else wanted it. We wasted three weeks of engineering time.
+
+5
+00:00:59.000 --> 00:01:15.000
+Priya: That must have been frustrating. How did the engineering team react?
+
+6
+00:01:16.000 --> 00:01:40.000
+Amit: They were angry. Our lead engineer told me he needs proof before he builds anything now. He said show me the data, show me the customer quotes, stop coming to me with gut feelings. And honestly he is right.
+
+7
+00:01:41.000 --> 00:01:55.000
+Priya: So the trust between product and engineering broke down?
+
+8
+00:01:56.000 --> 00:02:20.000
+Amit: Completely. Now every sprint planning feels like a courtroom. I am the lawyer trying to convince the jury. But I have no evidence. Just my memory of what customers said two weeks ago on a Zoom call.
+
+9
+00:02:21.000 --> 00:02:35.000
+Priya: Have you tried recording those Zoom calls?
+
+10
+00:02:36.000 --> 00:02:55.000
+Amit: We do record them but nobody watches a 45 minute recording. We tried Otter for transcription but it just gives you a wall of text. Finding the one quote I need takes longer than the original call.
+
+11
+00:02:56.000 --> 00:03:10.000
+Priya: What would the ideal solution look like for you?
+
+12
+00:03:11.000 --> 00:03:35.000
+Amit: I want to upload a Zoom call and get back a list of pain points with the exact customer quote attached. Not a summary. The actual words they said. So when my engineer asks why are we building this, I can click a link and play the exact 30 seconds where the customer described the problem.

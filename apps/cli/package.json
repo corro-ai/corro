@@ -10,6 +10,7 @@
     "@corro/ingest": "workspace:*",
     "@corro/transcribe": "workspace:*",
     "@corro/chunk": "workspace:*",
+    "@corro/extract": "workspace:*",
     "commander": "^12.1.0",
     "dotenv": "^17.4.2"
   },

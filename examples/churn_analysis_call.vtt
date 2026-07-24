@@ -1,0 +1,49 @@
+WEBVTT
+
+1
+00:00:01.000 --> 00:00:09.000
+Riya: Thanks for getting on this call Deepak. I know you recently decided not to renew. I would love to understand what led to that decision.
+
+2
+00:00:10.500 --> 00:00:32.000
+Deepak: Look I like the product. The core idea is solid. But we have been paying twelve hundred dollars a month for six months and I still cannot get my team to use it consistently. The onboarding was confusing, the UI keeps changing, and nobody on my team trusts the data it shows.
+
+3
+00:00:33.000 --> 00:00:42.000
+Riya: When you say nobody trusts the data, can you tell me more about that?
+
+4
+00:00:43.000 --> 00:01:08.000
+Deepak: We had two incidents. First, the analytics dashboard showed us that feature adoption was at eighty percent. But when we manually checked, it was closer to thirty. My VP saw the wrong number in a board deck. That was embarrassing. Second time, the churn prediction model flagged zero risk accounts for three months straight while we were actually losing customers.
+
+5
+00:01:09.000 --> 00:01:22.000
+Riya: That sounds serious. Did you report those issues to our support team?
+
+6
+00:01:23.000 --> 00:01:48.000
+Deepak: We did. Three times. The first ticket took eleven days to get a response. The second time we got a canned reply that did not address the problem. Third time someone actually looked into it and said it was a known issue that would be fixed in the next release. That was four months ago. Still not fixed.
+
+7
+00:01:49.000 --> 00:02:05.000
+Riya: I am sorry to hear that. Was there anything about the product that was working well for your team?
+
+8
+00:02:06.000 --> 00:02:28.000
+Deepak: The integration with Salesforce was actually great. That part was seamless. And the weekly email digest that summarizes account health, my team loved that. Simple, clear, useful. If the rest of the product was that polished we would have stayed.
+
+9
+00:02:29.000 --> 00:02:40.000
+Riya: If we fixed the data accuracy issues and improved support response time, would you consider coming back?
+
+10
+00:02:41.000 --> 00:03:05.000
+Deepak: Maybe. But honestly you also need to fix the pricing. Twelve hundred a month for a team of five is steep when half the features do not work reliably. I told your sales rep this during renewal negotiation but she had no flexibility. She kept reading from a script. That was the final straw. I felt like just another number.
+
+11
+00:03:06.000 --> 00:03:22.000
+Riya: What would a fair price look like for you?
+
+12
+00:03:23.000 --> 00:03:45.000
+Deepak: Five hundred for the tier we need. Or let us pay per seat. We have five users but only three are active. Why am I paying for seats nobody uses? Every other SaaS tool we use charges per active user. You are the only one still doing these rigid tier bundles.

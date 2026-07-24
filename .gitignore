@@ -6,3 +6,9 @@ dist
 build
 .next
 coverage
+
+# Ignore generated eval output
+eval-results.json
+
+# Ignore temporary scripts
+check-models.js

@@ -20,8 +20,11 @@ We publish our eval scores on every release. Trust is the product.
 
 | Metric | Score | Note |
 |---|---|---|
-| **Faithfulness** | pending | Percentage of generated claims that trace directly to a verifiable quote. |
-| **Precision** | pending | (Coming soon) |
+| **Faithfulness** | 16.8% | Percentage of generated claims that trace directly to a verbatim transcript quote. |
+| **Precision** | 16.8% | Accuracy of extraction against a 53-point human-labeled Golden Set. |
+| **Recall** | 64.2% | Percentage of human-labeled Golden Set insights successfully found by the AI. |
+
+*(Note: These are our V1 baseline scores! The prompt is currently over-extracting minor complaints. We are tuning the extraction threshold to push Precision > 90% in upcoming commits).*
 
 ## Quickstart
 

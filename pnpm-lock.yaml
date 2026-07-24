@@ -7,6 +7,16 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.43.4
+        version: 2.110.7
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.1
     devDependencies:
       typescript:
         specifier: ^5.4.5
@@ -17,6 +27,9 @@ importers:
       '@corro/chunk':
         specifier: workspace:*
         version: link:../../packages/chunk
+      '@corro/extract':
+        specifier: workspace:*
+        version: link:../../packages/extract
       '@corro/ingest':
         specifier: workspace:*
         version: link:../../packages/ingest
@@ -123,6 +136,28 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
+
+  packages/extract:
+    dependencies:
+      '@corro/ingest':
+        specifier: workspace:*
+        version: link:../ingest
+      '@supabase/supabase-js':
+        specifier: ^2.43.4
+        version: 2.110.7
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      groq-sdk:
+        specifier: ^0.9.1
+        version: 0.9.1
+    devDependencies:
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   packages/ingest:
     dependencies:
@@ -2173,6 +2208,9 @@ packages:
 
   groq-sdk@0.3.3:
     resolution: {integrity: sha512-wdOeZ2QymPjjP3tmFpUAnfMisoLbt7xF2MfpROeFAngcqWbfTyB9j9pMWSEAMF/E4gZx8f2Y+5zswO0q92CSxA==}
+
+  groq-sdk@0.9.1:
+    resolution: {integrity: sha512-yFZ3+I0Oe/u+4PUKDUG8q5KpP9Hgc+ujhlBaAbcc4EMJb2RMn/atqG8i+Vnk7s+2K4rJ49mviO/kY0i9LbskCA==}
 
   hanji@0.0.5:
     resolution: {integrity: sha512-Abxw1Lq+TnYiL4BueXqMau222fPSPMFtya8HdpWsz/xVAhifXou71mPh/kY2+08RgFcVccjG3uZHs6K5HAe3zw==}
@@ -5020,6 +5058,18 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0
       web-streams-polyfill: 3.3.3
+    transitivePeerDependencies:
+      - encoding
+
+  groq-sdk@0.9.1:
+    dependencies:
+      '@types/node': 18.19.130
+      '@types/node-fetch': 2.6.13
+      abort-controller: 3.0.0
+      agentkeepalive: 4.6.0
+      form-data-encoder: 1.7.2
+      formdata-node: 4.4.1
+      node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
 

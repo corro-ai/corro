@@ -82,4 +82,20 @@ program
     }
   });
 
+  import { extract } from "@corro/extract";
+
+// --- The "extract" command ---
+  program
+    .command("extract")
+    .description("Extract insights from chunks using Gemini Flash")
+    .requiredOption("--project <id>", "The project ID to extract insights from")
+    .action(async (options: { project: string }) => {
+      try {
+        await extract(options.project);
+      } catch (error) {
+        console.error(`\n❌ Error: ${(error as Error).message}\n`);
+        process.exit(1);
+      }
+    });
+
 program.parse();
