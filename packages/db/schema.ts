@@ -4,7 +4,7 @@ import { sql } from 'drizzle-orm';
 // Define the custom pgvector type for Drizzle
 const vector = customType<{ data: number[]; driverData: string }>({
   dataType() {
-    return 'vector(768)';
+    return 'vector(384)';
   },
   toDriver(value: number[]): string {
     return `[${value.join(',')}]`;
@@ -37,6 +37,7 @@ export const insights = pgTable('insights', {
   statement: text('statement').notNull(),
   severity: integer('severity'),
   confidence: doublePrecision('confidence'),
+  embedding: vector('embedding')
 });
 
 export const themes = pgTable('themes', {

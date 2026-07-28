@@ -5,6 +5,7 @@ import { ingest } from "@corro/ingest";
 import { transcribe } from "@corro/transcribe";
 import { chunk } from "@corro/chunk";
 import { IngestResult } from "@corro/ingest";
+import {cluster} from "@corro/cluster";
 
 // Load environment variables from root .env
 dotenv.config({ path: "../../.env" });
@@ -97,5 +98,18 @@ program
         process.exit(1);
       }
     });
+  
+  program
+    .command("cluster")
+    .description("Cluster insights into themes using vector embeddings")
+    .requiredOption("-p, --project <id>", "Project ID")
+    .action(async (options) => {
+      try {
+        await cluster(options.project);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
+  });
 
 program.parse();
