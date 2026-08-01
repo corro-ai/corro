@@ -11,6 +11,7 @@
     "@corro/cluster": "workspace:^",
     "@corro/extract": "workspace:*",
     "@corro/ingest": "workspace:*",
+    "@corro/synthesize": "workspace:^",
     "@corro/transcribe": "workspace:*",
     "commander": "^12.1.0",
     "dotenv": "^17.4.2"

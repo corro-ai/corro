@@ -36,6 +36,9 @@ importers:
       '@corro/ingest':
         specifier: workspace:*
         version: link:../../packages/ingest
+      '@corro/synthesize':
+        specifier: workspace:^
+        version: link:../../packages/synthesize
       '@corro/transcribe':
         specifier: workspace:*
         version: link:../../packages/transcribe
@@ -193,6 +196,25 @@ importers:
       '@types/node':
         specifier: ^20.12.12
         version: 20.19.43
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
+  packages/synthesize:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.110.0
+        version: 2.110.7
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+      groq-sdk:
+        specifier: ^0.15.0
+        version: 0.15.0
+    devDependencies:
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
       typescript:
         specifier: ^5.4.5
         version: 5.9.3

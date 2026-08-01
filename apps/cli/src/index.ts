@@ -6,6 +6,8 @@ import { transcribe } from "@corro/transcribe";
 import { chunk } from "@corro/chunk";
 import { IngestResult } from "@corro/ingest";
 import {cluster} from "@corro/cluster";
+import { synthesize } from "@corro/synthesize";
+import * as fs from "fs";
 
 // Load environment variables from root .env
 dotenv.config({ path: "../../.env" });
@@ -110,6 +112,25 @@ program
         console.error(err);
         process.exit(1);
       }
+  });
+
+  program
+  .command("report")
+  .description("Generate a Markdown insight report with citations")
+  .requiredOption("-p, --project <id>", "Project ID")
+  .action(async (options) => {
+    try {
+      const markdown = await synthesize(options.project);
+      
+      // Save it to a file
+      const filename = `report_${options.project.substring(0, 8)}.md`;
+      fs.writeFileSync(filename, markdown);
+      
+      console.log(`\n🎉 Report saved to: ${filename}\n`);
+    } catch (err) {
+      console.error(err);
+      process.exit(1);
+    }
   });
 
 program.parse();
