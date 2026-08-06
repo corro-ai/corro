@@ -34,7 +34,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 
 // --- The main cluster function ---
-export async function cluster(projectId: string): Promise<void> {
+export async function cluster(projectId: string): Promise<{ totalThemes: number; totalInsights: number }> {
   console.log(`\n🔮 Clustering insights for project: ${projectId}\n`);
 
   // ========== STEP 1: Embed all insights ==========
@@ -198,4 +198,6 @@ export async function cluster(projectId: string): Promise<void> {
     console.log(`🎉 Clustering complete!`);
     console.log(`   Themes created: ${clustered.length}`);
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+    return { totalThemes: clustered.length, totalInsights: insights.length };
   }

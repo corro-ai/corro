@@ -1,75 +1,246 @@
-import { ArrowRight, Database, FileCode2, Sparkles, Terminal } from "lucide-react";
+"use client";
+import { useState, useCallback, useEffect} from "react";
+import { v4 as uuidv4 } from "uuid";
+import { createClient } from "@supabase/supabase-js";
+import { create } from "domain";
 
-export default function LandingPage() {
+
+export default function Dashboard() {
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<"idle" | "uploading" | "processing" | "done" | "error">("idle");
+  const [projectId, setProjectId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status !== "processing" || !projectId) return;
+  
+    const interval = setInterval(async () => {
+      const res = await fetch(`/api/report/status?projectId=${projectId}`);
+      const data = await res.json();
+  
+      if (data.status === "done") {
+        clearInterval(interval);
+        setStatus("done");
+      }
+    }, 3000);
+  
+    return () => clearInterval(interval);
+  }, [status, projectId]);
+  
+
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+   // Handle file drop
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      setUploadedFile(file);
+      handleUpload(file);
+    }
+  }, []);
+
+  // Handle file input click
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUploadedFile(file);
+      handleUpload(file);
+    }
+  };
+
+  // Upload the file and trigger the pipeline
+  const handleUpload = async (file: File) => {
+    setStatus("uploading");
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+      );
+
+      const projectId = uuidv4();
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${projectId}/transcript.${fileExt}`;
+
+      const {error:uploadError} = await supabase.storage
+         .from("transcript")
+         .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+      
+      setProjectId(projectId)
+      setStatus("processing")
+
+      const response = await fetch("/api/inngest/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filePath, projectId }),
+      });
+      if (!response.ok) throw new Error("Failed to trigger pipeline");
+      } catch (err) {
+        console.error(err);
+        setStatus("error");
+      }
+
+
+  };
+
   return (
-    <div className="min-h-screen bg-black text-slate-50 selection:bg-blue-500/30">
-      {/* Navigation */}
-      <nav className="border-b border-white/10 bg-black/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-            <Sparkles className="w-5 h-5 text-blue-500" />
-            Corro
-          </div>
-          <a href="#waitlist" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-            Join Waitlist
-          </a>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-6 pt-24 pb-32">
-        <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-8">
-            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
-            Building in public
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
-            The <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">evidence layer</span> for spec-driven development.
-          </h1>
-          
-          <p className="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-            Coding agents are only as good as the specs you feed them. Corro turns customer calls and usage data into evidence-cited feature briefs—so your agents build exactly what users actually want.
-          </p>
-
-          {/* Waitlist Form */}
-          <div id="waitlist" className="bg-white/5 border border-white/10 rounded-2xl p-2 max-w-md flex items-center backdrop-blur-sm">
-            <input 
-              type="email" 
-              placeholder="name@startup.com" 
-              className="bg-transparent border-none outline-none px-4 py-2 w-full text-white placeholder:text-slate-500"
-            />
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 whitespace-nowrap">
-              Get Early Access <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Feature Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mt-32">
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 hover:bg-white/[0.07] transition-colors">
-            <Database className="w-10 h-10 text-blue-400 mb-6" />
-            <h3 className="text-xl font-semibold mb-3">Upload Anything</h3>
-            <p className="text-slate-400 leading-relaxed">
-              Drag and drop Zoom calls, Notion notes, and Slack exports. Corro extracts the exact pain points and links them to the timestamp.
+    <main style={{ maxWidth: "800px", margin: "0 auto", padding: "60px 24px" }}>
+      {/* Header */}
+      <div style={{ marginBottom: "48px" }}>
+        <h1 style={{ fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>
+          🔬 Corro
+        </h1>
+        <p style={{ color: "var(--muted)", fontSize: "16px" }}>
+          Turn customer calls into evidence-cited specs for AI coding agents.
+        </p>
+      </div>
+      {/* Upload Zone */}
+      <div
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        style={{
+          border: `2px dashed ${dragActive ? "var(--accent)" : "var(--card-border)"}`,
+          borderRadius: "16px",
+          padding: "60px 40px",
+          textAlign: "center",
+          background: dragActive ? "rgba(99, 102, 241, 0.05)" : "var(--card-bg)",
+          transition: "all 0.2s ease",
+          cursor: "pointer",
+          marginBottom: "32px",
+        }}
+        onClick={() => document.getElementById("file-input")?.click()}
+      >
+        <input
+          id="file-input"
+          type="file"
+          accept=".vtt,.srt,.txt,.mp3,.mp4,.m4a,.wav"
+          onChange={handleFileInput}
+          style={{ display: "none" }}
+        />
+        {status === "idle" && (
+          <>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>📁</div>
+            <p style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+              Drop your transcript or audio file here
             </p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 hover:bg-white/[0.07] transition-colors">
-            <FileCode2 className="w-10 h-10 text-cyan-400 mb-6" />
-            <h3 className="text-xl font-semibold mb-3">Evidence-Cited Specs</h3>
-            <p className="text-slate-400 leading-relaxed">
-              Generate OpenSpec-compatible markdown briefs where every feature requirement is cited back to a direct customer quote.
+            <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+              Supports .vtt, .srt, .txt, .mp3, .mp4, .m4a, .wav
             </p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 hover:bg-white/[0.07] transition-colors">
-            <Terminal className="w-10 h-10 text-indigo-400 mb-6" />
-            <h3 className="text-xl font-semibold mb-3">MCP Live Contract</h3>
-            <p className="text-slate-400 leading-relaxed">
-              When Cursor or Claude builds your feature, they can query the Corro MCP server to ask &quot;Why does this requirement exist?&quot;
+          </>
+        )}
+        {status === "uploading" && (
+          <>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>⏳</div>
+            <p style={{ fontSize: "18px", fontWeight: 600 }}>
+              Uploading {uploadedFile?.name}...
             </p>
+          </>
+        )}
+        {status === "processing" && (
+          <>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>🧠</div>
+            <p style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+              Running evidence pipeline...
+            </p>
+            <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+              Ingesting → Extracting → Clustering → Generating report
+            </p>
+          </>
+        )}
+        {status === "done" && (
+          <>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>✅</div>
+            <p style={{ fontSize: "18px", fontWeight: 600, color: "var(--success)" }}>
+              Report ready!
+            </p>
+            <a
+              href={`/report/${projectId}`}
+              style={{
+                display: "inline-block",
+                marginTop: "16px",
+                padding: "10px 24px",
+                background: "var(--accent)",
+                color: "white",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontWeight: 600,
+              }}
+            >
+              View Report →
+            </a>
+          </>
+        )}
+        
+        {status === "error" && (
+          <>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>❌</div>
+            <p style={{ fontSize: "18px", fontWeight: 600, color: "var(--danger)" }}>
+              Something went wrong. Please try again.
+            </p>
+          </>
+        )}
+      </div>
+      {/* Status Card */}
+      {uploadedFile && (
+        <div
+          style={{
+            background: "var(--card-bg)",
+            border: "1px solid var(--card-border)",
+            borderRadius: "12px",
+            padding: "20px 24px",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <p style={{ fontWeight: 600, fontSize: "15px" }}>{uploadedFile.name}</p>
+              <p style={{ color: "var(--muted)", fontSize: "13px" }}>
+                {(uploadedFile.size / 1024).toFixed(1)} KB
+              </p>
+            </div>
+            <div
+              style={{
+                padding: "4px 12px",
+                borderRadius: "9999px",
+                fontSize: "12px",
+                fontWeight: 600,
+                background:
+                  status === "done"
+                    ? "rgba(34, 197, 94, 0.1)"
+                    : status === "error"
+                    ? "rgba(239, 68, 68, 0.1)"
+                    : "rgba(99, 102, 241, 0.1)",
+                color:
+                  status === "done"
+                    ? "var(--success)"
+                    : status === "error"
+                    ? "var(--danger)"
+                    : "var(--accent)",
+              }}
+            >
+              {status === "uploading" && "Uploading..."}
+              {status === "processing" && "Processing..."}
+              {status === "done" && "Complete"}
+              {status === "error" && "Failed"}
+            </div>
           </div>
         </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }
+
