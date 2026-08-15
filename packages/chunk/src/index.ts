@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv"
 import { IngestResult, DialogueTurn } from "@corro/ingest";
 import { ChunkResult, SaveSourceInput } from "./types";
+import {embed} from "@corro/embed"
 
 // Load environment variables from root .env
 dotenv.config({ path: "../../.env" });
@@ -75,15 +76,21 @@ export async function chunk(
     if (!turn.text.trim()) continue;
     // Build the text with ±1 context window
     const textWithContext = buildContextWindow(ingestResult.turns, i);
-    // Save this chunk to Supabase
-    const { error } = await supabase.from("chunks").insert({
+    // Save this chunk to Supabase and GET THE ID BACK
+    const { data: chunkData, error } = await supabase.from("chunks").insert({
       source_id: sourceId,
       speaker: turn.speaker,
       text: textWithContext,
       start_ms: turn.startMs,
       end_ms: turn.endMs,
-    });
+    }).select("id").single();
+
     if (error) throw new Error(`Failed to save chunk: ${error.message}`);
+
+    // Generate and save embedding using the correct function name
+    const { embedding } = await embed(textWithContext);
+    await supabase.from("chunks").update({ embedding }).eq("id", chunkData.id);
+    console.log(`    🧮 Embedding saved for chunk ${totalChunks + 1}`);
     totalChunks++;
   }
   console.log(`✅ Saved ${totalChunks} chunks to Supabase!`);

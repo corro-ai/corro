@@ -70,12 +70,21 @@ importers:
       '@corro/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@corro/embed':
+        specifier: workspace:*
+        version: link:../../packages/embed
       '@corro/extract':
         specifier: workspace:^
         version: link:../../packages/extract
       '@corro/ingest':
         specifier: workspace:^
         version: link:../../packages/ingest
+      '@corro/qa':
+        specifier: workspace:*
+        version: link:../../packages/qa
+      '@corro/retrieval':
+        specifier: workspace:*
+        version: link:../../packages/retrieval
       '@corro/synthesize':
         specifier: workspace:^
         version: link:../../packages/synthesize
@@ -140,6 +149,9 @@ importers:
 
   packages/chunk:
     dependencies:
+      '@corro/embed':
+        specifier: workspace:*
+        version: link:../embed
       '@corro/ingest':
         specifier: workspace:*
         version: link:../ingest
@@ -201,6 +213,15 @@ importers:
         specifier: ^5.4.5
         version: 5.9.3
 
+  packages/embed:
+    dependencies:
+      '@xenova/transformers':
+        specifier: ^2.17.2
+        version: 2.17.2
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+
   packages/extract:
     dependencies:
       '@corro/ingest':
@@ -235,6 +256,30 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
+
+  packages/qa:
+    dependencies:
+      '@corro/retrieval':
+        specifier: workspace:*
+        version: link:../retrieval
+      dotenv:
+        specifier: ^16.0.0
+        version: 16.6.1
+      groq-sdk:
+        specifier: latest
+        version: 1.5.0
+
+  packages/retrieval:
+    dependencies:
+      '@corro/embed':
+        specifier: workspace:*
+        version: link:../embed
+      '@supabase/supabase-js':
+        specifier: ^2.43.4
+        version: 2.112.0(@opentelemetry/api@1.9.1)
+      dotenv:
+        specifier: ^16.0.0
+        version: 16.6.1
 
   packages/synthesize:
     dependencies:
@@ -3204,6 +3249,10 @@ packages:
 
   groq-sdk@0.9.1:
     resolution: {integrity: sha512-yFZ3+I0Oe/u+4PUKDUG8q5KpP9Hgc+ujhlBaAbcc4EMJb2RMn/atqG8i+Vnk7s+2K4rJ49mviO/kY0i9LbskCA==}
+
+  groq-sdk@1.5.0:
+    resolution: {integrity: sha512-aa5yaMVd8kehBacU3Pp7roObOuPksZNau+nPW+GDDB7OV/8jybVzeeOv54lZj8owNNIc3a7Tu2eYI7/kIwtMNw==}
+    hasBin: true
 
   guid-typescript@1.0.9:
     resolution: {integrity: sha512-Y8T4vYhEfwJOTbouREvG+3XDsjr8E3kIr7uf+JZ0BYloFsttiHU0WfvANVsR7TxNUJa/WpCnw/Ino/p+DeBhBQ==}
@@ -7775,6 +7824,8 @@ snapshots:
       node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
+
+  groq-sdk@1.5.0: {}
 
   guid-typescript@1.0.9: {}
 

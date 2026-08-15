@@ -4,8 +4,10 @@ import * as dotenv from "dotenv";
 import { Insight, InsightKind, ExtractResult } from "./types";
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompt";
 
+import * as path from "path";
+
 // Load environment variables from root .env
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Initialize Groq
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -124,6 +126,7 @@ export async function extract(projectId: string): Promise<ExtractResult> {
         chunk_id: chunk.id,
         kind: insight.kind,
         statement: insight.statement,
+        quote: insight.quote,
         severity: insight.severity,
         confidence: insight.confidence,
       });

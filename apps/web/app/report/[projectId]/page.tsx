@@ -55,7 +55,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
   return (
     <main style={{ maxWidth: "800px", margin: "0 auto", padding: "60px 24px" }}>
       {/* Top Navigation */}
-      <div style={{ marginBottom: "40px" }}>
+      <div style={{ marginBottom: "40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Link 
           href="/" 
           style={{
@@ -70,6 +70,26 @@ export default async function ReportPage({ params }: { params: Promise<{ project
           }}
         >
           <ArrowLeft size={16} /> Back to Upload
+        </Link>
+
+        <Link
+          href={`/chat/${projectId}`}
+          className="glow-button"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 16px",
+            background: "var(--card-bg)",
+            border: "1px solid var(--accent)",
+            color: "var(--accent)",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: "14px",
+          }}
+        >
+          💬 Ask Questions
         </Link>
       </div>
 

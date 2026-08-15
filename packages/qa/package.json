@@ -1,0 +1,11 @@
+{
+    "name": "@corro/qa",
+    "version": "0.0.1",
+    "private": true,
+    "main": "src/index.ts",
+    "dependencies": {
+      "@corro/retrieval": "workspace:*",
+      "groq-sdk": "latest",
+      "dotenv": "^16.0.0"
+    }
+  }

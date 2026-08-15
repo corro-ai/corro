@@ -35,6 +35,7 @@ export const insights = pgTable('insights', {
   chunkId: uuid('chunk_id').notNull().references(() => chunks.id, { onDelete: 'cascade' }),
   kind: text('kind').notNull(), // 'pain' | 'request' | 'praise' | 'confusion'
   statement: text('statement').notNull(),
+  quote: text('quote').notNull(),
   severity: integer('severity'),
   confidence: doublePrecision('confidence'),
   embedding: vector('embedding')
