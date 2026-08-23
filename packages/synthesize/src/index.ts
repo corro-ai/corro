@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
-import Groq from "groq-sdk";
+import { OpenRouter } from "@openrouter/sdk";
 import * as dotenv from "dotenv";
 import * as path from "path";
 
@@ -12,7 +12,7 @@ const supabase = createClient(
 )
 
 // Initialize Groq
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+const openrouter = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY! });
 
 // --- Helper: format milliseconds into MM:SS ---
 function formatTime(ms: number): string {
@@ -148,20 +148,37 @@ export async function synthesize(projectId: string): Promise<string> {
       .map((t, i) => `${i + 1}. **${t.label}** (${t.insights.length} mentions, avg severity ${t.avgSeverity.toFixed(1)})`)
       .join("\n");
     // Ask Groq to write a short executive summary
-    const summaryResponse = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.4,
-      messages: [
-        {
-          role: "system",
-          content: "You are a product analyst. Write a 2-3 sentence executive summary of the top customer feedback themes. Be direct and actionable. Do not use bullet points.",
-        },
-        {
-          role: "user",
-          content: `Top themes from customer interviews:\n${summaryText}`,
-        },
-      ],
+    const stream = await openrouter.chat.send({
+      chatRequest: {
+        model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+        temperature: 0.4,
+        messages: [
+          {
+            role: "system",
+            content: "You are a product analyst. Write a 2-3 sentence executive summary of the top customer feedback themes. Be direct and actionable. Do not use bullet points.",
+          },
+          {
+            role: "user",
+            content: `Top themes from customer interviews:\n${summaryText}`,
+          },
+        ],
+        stream: true
+      }
     });
+    
+    let summaryContent = "";
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        summaryContent += content;
+        process.stdout.write(content);
+      }
+      if (chunk.usage) {
+        console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+      }
+    }
+    
+    const summaryResponse = { choices: [{ message: { content: summaryContent } }] };
     markdown += `${summaryResponse.choices[0]?.message?.content || "No summary available."}\n\n`;
     markdown += `---\n\n`;
     // --- Theme Sections ---

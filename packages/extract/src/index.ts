@@ -1,4 +1,4 @@
-import Groq from "groq-sdk";
+import { OpenRouter } from "@openrouter/sdk";
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
 import { Insight, InsightKind, ExtractResult } from "./types";
@@ -10,7 +10,7 @@ import * as path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Initialize Groq
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openrouter = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
 
 // Initialize Supabase
 const supabase = createClient(
@@ -26,24 +26,46 @@ async function extractFromChunk(
   const userPrompt = buildUserPrompt(chunkText);
 
   // Call Groq (Llama 3.3 70B)
-  const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: 0.1,   // Low temperature = more deterministic, better for JSON
-    response_format: { type: "json_object" },  // Forces valid JSON output
+  const stream = await openrouter.chat.send({
+    chatRequest: {
+      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.1,
+      stream: true
+    }
   });
 
-  const responseText = completion.choices[0]?.message?.content?.trim() ?? "";
+  let responseText = "";
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
+    if (content) {
+      responseText += content;
+      process.stdout.write(content);
+    }
+    if (chunk.usage) {
+      console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+    }
+  }
 
   // Parse the JSON response
   let parsed: any;
   try {
-    parsed = JSON.parse(responseText);
-  } catch {
-    console.warn(`⚠️  Groq returned invalid JSON for chunk ${chunkId}, skipping.`);
+    // Strip markdown code blocks if the model wrapped it in ```json ... ```
+    let cleanText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    
+    // Attempt to extract just the JSON array or object
+    const jsonMatch = cleanText.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+    if (jsonMatch) {
+      parsed = JSON.parse(jsonMatch[0]);
+    } else {
+      parsed = JSON.parse(cleanText);
+    }
+  } catch (e) {
+    console.warn(`⚠️  Model returned invalid JSON for chunk ${chunkId}, skipping.`);
+    console.log("RAW RESPONSE WAS:", responseText.substring(0, 200) + "...");
     return [];
   }
 

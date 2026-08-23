@@ -113,6 +113,11 @@ corro/
 │   ├── cluster/                # Cosine similarity clustering + LLM theme labeling
 │   ├── synthesize/             # Gemini report generation with evidence citations
 │   ├── transcribe/             # Groq Whisper audio → text
+│   ├── retrieval/              # Hybrid search (semantic + keyword) via pgvector
+│   ├── qa/                     # RAG pipeline for answering evidence-backed questions
+│   ├── ingest-csv/             # Parses product funnel metrics (Amplitude/PostHog CSVs)
+│   ├── opportunity/            # Qual x Quant overlap scoring using LLMs
+│   ├── brief/                  # Generates Spec Kit compatible Feature Briefs from evidence
 │   ├── db/                     # Drizzle ORM schema (Supabase/Postgres)
 │   └── cli/                    # CLI tool for running the pipeline locally
 │
@@ -125,8 +130,8 @@ corro/
 
 - [x] **Phase 1:** Open-source evidence pipeline (ingest → chunk → extract → cluster → synthesize)
 - [x] **Phase 1.5:** Web app with drag-and-drop upload, background pipeline via Inngest, and report polling
-- [ ] **Phase 2:** Eval-driven improvement (faithfulness > 90%, precision > 90%)
-- [ ] **Phase 3:** Qual × Quant opportunity engine (PostHog integration)
+- [x] **Phase 2:** Corpus Q&A (RAG chat with citations and confidence indicators)
+- [x] **Phase 3:** Qual × Quant opportunity engine (Feature Brief generation via PostHog/CSV metrics + qualitative insights overlap)
 - [ ] **Phase 4:** Bidirectional MCP server for coding agents (live spec contracts)
 
 ## Built in Public

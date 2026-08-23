@@ -1,4 +1,4 @@
-import Groq from "groq-sdk";
+import { OpenRouter } from "@openrouter/sdk";
 import { retrieve } from "@corro/retrieval";
 import { AnswerResult, Citation } from "./types";
 import * as dotenv from "dotenv";
@@ -6,7 +6,7 @@ import * as path from "path";
 
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openrouter = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
 
 const QA_SYSTEM_PROMPT = `You are a product research assistant. Your job is to answer the user's question using ONLY the provided transcript chunks.
 
@@ -44,14 +44,36 @@ export async function ask(
       .join("\n\n");
   
     // Step 4: Call Groq LLM with the context + question
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: QA_SYSTEM_PROMPT },
-        { role: "user", content: `CONTEXT:\n${context}\n\nQUESTION: ${question}` },
-      ],
-      temperature: 0.2,
+    const stream = await openrouter.chat.send({
+      chatRequest: {
+        model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+        temperature: 0.3,
+        messages: [
+          {
+            role: "system",
+            content: QA_SYSTEM_PROMPT
+          },
+          {
+            role: "user",
+            content: `Context:\\n${context}\\n\\nQuestion: ${question}`
+          }
+        ],
+        stream: true
+      }
     });
+
+    let qaContent = "";
+    for await (const chunk of stream) {
+      const chunkContent = chunk.choices[0]?.delta?.content;
+      if (chunkContent) {
+        qaContent += chunkContent;
+        process.stdout.write(chunkContent);
+      }
+      if (chunk.usage) {
+        console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+      }
+    }
+    const completion = { choices: [{ message: { content: qaContent } }] };
   
     const answer = completion.choices[0]?.message?.content || "No response generated.";
   

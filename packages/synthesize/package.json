@@ -7,9 +7,10 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@openrouter/sdk": "^1.2.54",
     "@supabase/supabase-js": "^2.110.0",
-    "groq-sdk": "^0.15.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "groq-sdk": "^0.15.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

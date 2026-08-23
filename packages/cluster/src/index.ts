@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import Groq from "groq-sdk";
+import { OpenRouter } from "@openrouter/sdk";
 import * as dotenv from "dotenv";
 import * as path from "path";
 import { embed } from "./embed";
@@ -14,7 +14,7 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-const groq = new Groq({apiKey: process.env.GROQ_API_KEY})
+const openrouter = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
 
 
 // --- Cosine Similarity ---
@@ -132,22 +132,36 @@ export async function cluster(projectId: string): Promise<{ totalThemes: number;
       console.log(`  🏷️  Cluster ${i + 1} (${group.insights.length} insights, avg severity ${avgSeverity.toFixed(1)}):`);
   
       // Ask Groq to name this cluster
-      const response = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: `You are a product analyst. Given a list of customer feedback insights that belong to the same theme, provide a short label and description.
-  Return ONLY valid JSON: {"label": "3-5 word theme name", "description": "One sentence describing this theme"}`,
-          },
-          {
-            role: "user",
-            content: `Here are ${group.insights.length} related customer feedback insights:\n\n${statements}`,
-          },
-        ],
+      const stream = await openrouter.chat.send({
+        chatRequest: {
+          model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+          temperature: 0.3,
+          messages: [
+            {
+              role: "system",
+              content: "You are a UX researcher. Name this cluster of insights. Return ONLY JSON like {\"label\": \"string\", \"description\": \"string\"}. Keep label under 5 words, description under 15 words."
+            },
+            {
+              role: "user",
+              content: JSON.stringify(group.insights.map(i => i.statement))
+            }
+          ],
+          stream: true
+        }
       });
+      
+      let responseContent = "";
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+          responseContent += content;
+          process.stdout.write(content);
+        }
+        if (chunk.usage) {
+          console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+        }
+      }
+      const response = { choices: [{ message: { content: responseContent } }] };
   
       const content = response.choices[0]?.message?.content || "{}";
       let label = "Unlabeled Theme";

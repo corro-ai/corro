@@ -1,11 +1,12 @@
 {
-    "name": "@corro/qa",
-    "version": "0.0.1",
-    "private": true,
-    "main": "src/index.ts",
-    "dependencies": {
-      "@corro/retrieval": "workspace:*",
-      "groq-sdk": "latest",
-      "dotenv": "^16.0.0"
-    }
+  "name": "@corro/qa",
+  "version": "0.0.1",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "@corro/retrieval": "workspace:*",
+    "@openrouter/sdk": "^1.2.54",
+    "dotenv": "^16.0.0",
+    "groq-sdk": "latest"
   }
+}

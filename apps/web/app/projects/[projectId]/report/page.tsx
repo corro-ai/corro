@@ -4,6 +4,8 @@ import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import ReportPollingState from "@/src/components/ReportPollingState";
+
 export default async function ReportPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;
 
@@ -22,33 +24,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
 
   // 3. Handle 'not found' or 'error' state
   if (error || !report) {
-    return (
-      <main style={{ maxWidth: "800px", margin: "0 auto", padding: "100px 24px", textAlign: "center" }}>
-        <h1 style={{ fontSize: "32px", fontWeight: 700, marginBottom: "16px", color: "var(--danger)" }}>
-          Report Not Found
-        </h1>
-        <p style={{ color: "var(--muted)", marginBottom: "32px" }}>
-          We couldn't find a generated report for this project ID. It might still be processing, or the ID is invalid.
-        </p>
-        <Link 
-          href="/" 
-          className="glow-button"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "12px 24px",
-            background: "var(--accent)",
-            color: "white",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: 600,
-          }}
-        >
-          <ArrowLeft size={18} /> Back to Dashboard
-        </Link>
-      </main>
-    );
+    return <ReportPollingState />;
   }
 
   // 4. Return the beautifully rendered Markdown UI

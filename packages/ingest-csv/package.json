@@ -1,0 +1,12 @@
+{
+    "name": "@corro/ingest-csv",
+    "version": "0.1.0",
+    "private": true,
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "dependencies": {
+      "@corro/db": "workspace:*",
+      "@supabase/supabase-js": "^2.43.4",
+      "dotenv": "^16.4.5"
+    }
+  }

@@ -11,9 +11,17 @@ const vector = customType<{ data: number[]; driverData: string }>({
   },
 });
 
+// --- PROJECTS ---
+export const projects = pgTable('projects', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const sources = pgTable('sources', {
   id: uuid('id').primaryKey().defaultRandom(),
-  projectId: uuid('project_id').notNull(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
   type: text('type').notNull(), // 'transcript' | 'audio' | 'slack' | 'notion'
   filename: text('filename').notNull(),
   uploadedAt: timestamp('uploaded_at', { withTimezone: true }).notNull().defaultNow(),
@@ -43,7 +51,7 @@ export const insights = pgTable('insights', {
 
 export const themes = pgTable('themes', {
   id: uuid('id').primaryKey().defaultRandom(),
-  projectId: uuid('project_id').notNull(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
   label: text('label').notNull(),
   description: text('description'),
 });
@@ -57,7 +65,7 @@ export const themeInsights = pgTable('theme_insights', {
 
 export const reports = pgTable('reports', {
   id: uuid('id').primaryKey().defaultRandom(),
-  projectId: uuid('project_id').notNull(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
   generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
   contentMd: text('content_md').notNull(),
 });
@@ -67,4 +75,43 @@ export const reportClaims = pgTable('report_claims', {
   reportId: uuid('report_id').notNull().references(() => reports.id, { onDelete: 'cascade' }),
   claimText: text('claim_text').notNull(),
   insightIds: uuid('insight_ids').array().notNull(),
+});
+
+
+// --- PHASE 3: OPPORTUNITY ENGINE ---
+
+export const metrics = pgTable('metrics', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }), // Links to projects table
+  name: text('name').notNull(),            // e.g., "checkout_dropoff"
+  value: text('value').notNull(),          // e.g., "30%" or "500" (stored as text to handle varying formats)
+  dimension: text('dimension'),            // e.g., "pricing_page"
+  period: text('period'),                  // e.g., "last_30_days"
+  source: text('source').notNull(),        // e.g., "csv_upload"
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const opportunities = pgTable('opportunities', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  score: integer('score').notNull(),       // RICE-style ranking score
+  status: text('status').notNull().default('open'), // 'open' | 'in_progress' | 'shipped'
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const opportunityEvidence = pgTable('opportunity_evidence', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),            // 'insight' | 'metric'
+  insightId: uuid('insight_id').references(() => insights.id, { onDelete: 'cascade' }),
+  metricId: uuid('metric_id').references(() => metrics.id, { onDelete: 'cascade' }),
+});
+
+export const featureBriefs = pgTable('feature_briefs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
+  contentMd: text('content_md').notNull(),
+  generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
 });
