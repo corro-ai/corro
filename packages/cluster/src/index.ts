@@ -151,7 +151,7 @@ export async function cluster(projectId: string): Promise<{ totalThemes: number;
       });
       
       let responseContent = "";
-      for await (const chunk of stream) {
+      for await (const chunk of stream as any) {
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
           responseContent += content;

@@ -74,7 +74,7 @@ export async function generateBrief(opportunityId: string) {
   });
 
   let markdownContent = "";
-  for await (const chunk of stream) {
+  for await (const chunk of stream as any) {
     const chunkContent = chunk.choices[0]?.delta?.content;
     if (chunkContent) {
       markdownContent += chunkContent;

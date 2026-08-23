@@ -67,7 +67,7 @@ export async function scoreOpportunities(projectId: string) {
   });
 
   let responseContent = "";
-  for await (const chunk of stream) {
+  for await (const chunk of stream as any) {
     const chunkContent = chunk.choices[0]?.delta?.content;
     if (chunkContent) {
       responseContent += chunkContent;
@@ -79,7 +79,7 @@ export async function scoreOpportunities(projectId: string) {
   }
 
   // Parse JSON robustly
-  let parsed = {};
+  let parsed: any = {};
   try {
     let cleanText = responseContent.replace(/```json/g, "").replace(/```/g, "").trim();
     const jsonMatch = cleanText.match(/\[[\s\S]*\]|\{[\s\S]*\}/);

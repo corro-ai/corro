@@ -63,7 +63,7 @@ export async function ask(
     });
 
     let qaContent = "";
-    for await (const chunk of stream) {
+    for await (const chunk of stream as any) {
       const chunkContent = chunk.choices[0]?.delta?.content;
       if (chunkContent) {
         qaContent += chunkContent;

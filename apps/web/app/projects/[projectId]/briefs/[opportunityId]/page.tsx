@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Quote, BarChart2, AlertCircle } from "lucide-react";
 
-export default function FeatureBriefViewer({ params }: { params: { opportunityId: string } }) {
+export default function FeatureBriefViewer({ params }: { params: Promise<{ opportunityId: string, projectId: string }> }) {
+  const { opportunityId, projectId } = use(params);
   const [brief, setBrief] = useState<any>(null);
   const [opportunity, setOpportunity] = useState<any>(null);
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -19,14 +20,14 @@ export default function FeatureBriefViewer({ params }: { params: { opportunityId
 
   useEffect(() => {
     fetchData();
-  }, [params.opportunityId]);
+  }, [opportunityId]);
 
   async function fetchData() {
     // 1. Fetch Opportunity
     const { data: oppData } = await supabase
       .from("opportunities")
       .select("*")
-      .eq("id", params.opportunityId)
+      .eq("id", opportunityId)
       .single();
     if (oppData) setOpportunity(oppData);
 
@@ -34,7 +35,7 @@ export default function FeatureBriefViewer({ params }: { params: { opportunityId
     const { data: briefData } = await supabase
       .from("feature_briefs")
       .select("*")
-      .eq("opportunity_id", params.opportunityId)
+      .eq("opportunity_id", opportunityId)
       .single();
     if (briefData) setBrief(briefData);
 
@@ -42,7 +43,7 @@ export default function FeatureBriefViewer({ params }: { params: { opportunityId
     const { data: evidence } = await supabase
       .from("opportunity_evidence")
       .select("*")
-      .eq("opportunity_id", params.opportunityId);
+      .eq("opportunity_id", opportunityId);
 
     if (evidence && evidence.length > 0) {
       const metricIds = evidence.filter(e => e.type === "metric").map(e => e.metric_id);
@@ -73,7 +74,7 @@ export default function FeatureBriefViewer({ params }: { params: { opportunityId
         <AlertCircle size={48} className="text-zinc-600 mb-4" />
         <h2 className="text-xl font-bold">Brief Not Found</h2>
         <p className="text-zinc-400">Click "Generate Brief" on the dashboard first.</p>
-        <Link href={`/opportunities/${opportunity?.project_id}`} className="mt-6 text-indigo-400 hover:underline">
+        <Link href={`/projects/${projectId}/opportunities`} className="mt-6 text-indigo-400 hover:underline">
           Go back to Dashboard
         </Link>
       </div>
@@ -85,7 +86,7 @@ export default function FeatureBriefViewer({ params }: { params: { opportunityId
       {/* Header */}
       <header className="border-b border-zinc-800 bg-zinc-950 p-4 flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
-          <Link href={`/opportunities/${opportunity?.project_id}`} className="text-zinc-500 hover:text-white transition-colors">
+          <Link href={`/projects/${projectId}/opportunities`} className="text-zinc-500 hover:text-white transition-colors">
             <ArrowLeft size={20} />
           </Link>
           <div>

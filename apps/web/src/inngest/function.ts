@@ -113,9 +113,28 @@ export const generateOpportunitiesAndBriefs = inngest.createFunction(
     });
 
     // Step 2: Automatically generate the Feature Brief for the highest scoring opportunity
-    // Note: The original scoreOpportunities logic doesn't return the IDs yet, 
-    // but assuming it does, we would generate the brief here.
-    // We will bypass the strict loop for now and just log success if it runs.
+    const topOpp = await step.run("get_top_opportunity", async () => {
+      const { createClient } = require("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+      const { data } = await supabase
+        .from("opportunities")
+        .select("id")
+        .eq("project_id", projectId)
+        .order("score", { ascending: false })
+        .limit(1)
+        .single();
+      return data;
+    });
+
+    if (topOpp) {
+      await step.run("generate_brief", async () => {
+        console.log(`📝 Generating PRD for opportunity: ${topOpp.id}`);
+        return await generateBrief(topOpp.id);
+      });
+    }
 
     return { 
       message: "Opportunity Pipeline Complete", 
