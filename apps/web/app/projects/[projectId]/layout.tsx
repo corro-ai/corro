@@ -1,4 +1,4 @@
-import Sidebar from "@/src/components/layout/Sidebar";
+import Sidebar from "@/src/components/Layout/Sidebar";
 
 export default async function ProjectLayout({
   children,
