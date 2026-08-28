@@ -39,8 +39,8 @@ export async function generateBrief(opportunityId: string) {
   const metricIds = evidence.filter(e => e.type === "metric").map(e => e.metric_id);
   const insightIds = evidence.filter(e => e.type === "insight").map(e => e.insight_id);
 
-  const { data: metrics } = await supabase.from("metrics").select("*").in("id", metricIds);
-  const { data: insights } = await supabase.from("insights").select("*").in("id", insightIds);
+  const { data: metrics } = metricIds.length > 0 ? await supabase.from("metrics").select("*").in("id", metricIds) : { data: [] };
+  const { data: insights } = insightIds.length > 0 ? await supabase.from("insights").select("*").in("id", insightIds) : { data: [] };
 
   // 3. Build the Spec Prompt
   const prompt = `
@@ -66,7 +66,7 @@ export async function generateBrief(opportunityId: string) {
 
   const stream = await openrouter.chat.send({
     chatRequest: {
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+      model: "nvidia/nemotron-3.5-lightning:free",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
       stream: true
@@ -75,7 +75,11 @@ export async function generateBrief(opportunityId: string) {
 
   let markdownContent = "";
   for await (const chunk of stream as any) {
-    const chunkContent = chunk.choices[0]?.delta?.content;
+    if (chunk.error) {
+      console.error("OpenRouter API Error:", chunk.error);
+      throw new Error(`OpenRouter API Error: ${chunk.error.message || JSON.stringify(chunk.error)}`);
+    }
+    const chunkContent = chunk.choices?.[0]?.delta?.content;
     if (chunkContent) {
       markdownContent += chunkContent;
       process.stdout.write(chunkContent);
@@ -85,15 +89,33 @@ export async function generateBrief(opportunityId: string) {
     }
   }
 
-  // 5. Save the generated Brief to the database
+  if (!markdownContent || markdownContent.trim() === "") {
+    throw new Error("AI returned an empty response. This is usually due to free tier rate limits.");
+  }
+
+  // 5. Calculate the next version number
+  const { data: existingBriefs } = await supabase
+    .from("feature_briefs")
+    .select("version")
+    .eq("opportunity_id", opportunityId)
+    .order("version", { ascending: false })
+    .limit(1);
+
+  const nextVersion = existingBriefs && existingBriefs.length > 0 
+    ? (existingBriefs[0].version || 1) + 1 
+    : 1;
+
+  // 6. Save the new version to the database
   const { error } = await supabase.from("feature_briefs").insert({
     opportunity_id: opportunityId,
-    content_md: markdownContent
+    content_md: markdownContent,
+    version: nextVersion
   });
 
   if (error) {
     console.error("❌ Failed to save Feature Brief:", error.message);
+    throw new Error(`Failed to save Feature Brief: ${error.message}`);
   } else {
-    console.log("✅ Feature Brief generated and saved successfully!");
+    console.log(`✅ Feature Brief v${nextVersion} generated and saved successfully!`);
   }
 }

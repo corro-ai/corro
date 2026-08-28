@@ -77,35 +77,36 @@ export async function synthesize(projectId: string): Promise<string> {
 
         if (!insights || insights.length === 0) continue;
 
-        // For each insight, get the chunk and source (for speaker, filename, timestamp)
-        const enrichedInsights = [];
-        for (const insight of insights) {
+        // Bulk fetch all chunks and sources (instead of 1 query per insight)
+        const chunkIds = [...new Set(insights.map(i => i.chunk_id))];
+        const { data: chunksData } = await supabase
+          .from("chunks")
+          .select("id, speaker, text, start_ms, source_id")
+          .in("id", chunkIds);
 
-          const { data: chunk } = await supabase
-            .from("chunks")
-            .select("speaker, text, start_ms, source_id")
-            .eq("id", insight.chunk_id)
-            .single()
+        const chunkMap = new Map((chunksData || []).map(c => [c.id, c]));
 
-          if (!chunk) continue;
+        const sourceIds = [...new Set((chunksData || []).map(c => c.source_id))];
+        const { data: sourcesData } = sourceIds.length > 0
+          ? await supabase.from("sources").select("id, filename").in("id", sourceIds)
+          : { data: [] };
 
-          const { data: source } = await supabase
-            .from("sources")
-            .select("filename")
-            .eq("id", chunk.source_id)
-            .single();
+        const sourceMap = new Map((sourcesData || []).map(s => [s.id, s]));
 
-          enrichedInsights.push({
+        const enrichedInsights = insights.map(insight => {
+          const chunk = chunkMap.get(insight.chunk_id);
+          const source = chunk ? sourceMap.get(chunk.source_id) : null;
+          return {
             statement: insight.statement,
             kind: insight.kind,
             severity: insight.severity,
-            speaker: chunk.speaker,
+            speaker: chunk?.speaker || "unknown",
             filename: source?.filename || "unknown",
-            startMs: chunk.start_ms,
-            chunkText: chunk.text,
-          });
-          
-        }
+            startMs: chunk?.start_ms || 0,
+            chunkText: chunk?.text || "",
+          };
+        }).filter(i => i.speaker !== "unknown");
+
         enrichmentThemes.push({
           label: theme.label,
           description: theme.description,
@@ -147,39 +148,60 @@ export async function synthesize(projectId: string): Promise<string> {
     const summaryText = topThemes
       .map((t, i) => `${i + 1}. **${t.label}** (${t.insights.length} mentions, avg severity ${t.avgSeverity.toFixed(1)})`)
       .join("\n");
-    // Ask Groq to write a short executive summary
-    const stream = await openrouter.chat.send({
-      chatRequest: {
-        model: "nvidia/nemotron-3-ultra-550b-a55b:free",
-        temperature: 0.4,
-        messages: [
-          {
-            role: "system",
-            content: "You are a product analyst. Write a 2-3 sentence executive summary of the top customer feedback themes. Be direct and actionable. Do not use bullet points.",
-          },
-          {
-            role: "user",
-            content: `Top themes from customer interviews:\n${summaryText}`,
-          },
-        ],
-        stream: true
+    // Ask LLM to write a short executive summary (with retry)
+    let summaryContent = "No summary available.";
+    try {
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const stream = await openrouter.chat.send({
+            chatRequest: {
+              model: "thinkingmachines/inkling:free",
+              temperature: 0.4,
+              messages: [
+                {
+                  role: "system",
+                  content: "You are a product analyst. Write a 2-3 sentence executive summary of the top customer feedback themes. Be direct and actionable. Do not use bullet points.",
+                },
+                {
+                  role: "user",
+                  content: `Top themes from customer interviews:\n${summaryText}`,
+                },
+              ],
+              stream: true
+            }
+          });
+          
+          summaryContent = "";
+          for await (const chunk of stream as any) {
+            const content = chunk.choices?.[0]?.delta?.content;
+            if (content) {
+              summaryContent += content;
+            }
+            if (chunk.usage) {
+              console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+            }
+          }
+
+          if (!summaryContent || summaryContent.trim() === "") {
+            throw new Error("AI returned empty response");
+          }
+          console.log(`📝 [Synthesize] Executive summary generated successfully`);
+          break; // Success
+        } catch (err: any) {
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.warn(`    ⚠️  Attempt ${attempt}/3 failed: ${err.message}. Retrying in ${waitTime / 1000}s...`);
+          if (attempt === 3) {
+            console.warn(`    ⚠️  All retries failed for executive summary, using default`);
+            summaryContent = "No summary available.";
+          }
+          await new Promise(r => setTimeout(r, waitTime));
+        }
       }
-    });
-    
-    let summaryContent = "";
-    for await (const chunk of stream as any) {
-      const content = chunk.choices[0]?.delta?.content;
-      if (content) {
-        summaryContent += content;
-        process.stdout.write(content);
-      }
-      if (chunk.usage) {
-        console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
-      }
+    } catch (err: any) {
+      console.warn(`    ⚠️  Executive summary generation failed: ${err.message}`);
     }
-    
-    const summaryResponse = { choices: [{ message: { content: summaryContent } }] };
-    markdown += `${summaryResponse.choices[0]?.message?.content || "No summary available."}\n\n`;
+
+    markdown += `${summaryContent}\n\n`;
     markdown += `---\n\n`;
     // --- Theme Sections ---
     for (const theme of ranked) {

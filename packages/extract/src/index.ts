@@ -18,6 +18,47 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// --- Retry wrapper for AI calls ---
+async function callAIWithRetry(messages: any[], maxRetries = 3): Promise<string> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const stream = await openrouter.chat.send({
+        chatRequest: {
+          model: "thinkingmachines/inkling:free",
+          messages,
+          temperature: 0.1,
+          stream: true
+        }
+      });
+
+      let responseText = "";
+      for await (const chunk of stream as any) {
+        const content = chunk.choices?.[0]?.delta?.content;
+        if (content) {
+          responseText += content;
+        }
+        if (chunk.usage) {
+          console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+        }
+      }
+
+      if (!responseText || responseText.trim() === "") {
+        throw new Error("AI returned empty response");
+      }
+
+      return responseText;
+    } catch (err: any) {
+      const waitTime = Math.pow(2, attempt) * 1000;
+      console.warn(`    ⚠️  Attempt ${attempt}/${maxRetries} failed: ${err.message}. Retrying in ${waitTime / 1000}s...`);
+      if (attempt === maxRetries) {
+        throw new Error(`AI call failed after ${maxRetries} retries: ${err.message}`);
+      }
+      await new Promise(r => setTimeout(r, waitTime));
+    }
+  }
+  throw new Error("Unreachable");
+}
+
 // --- Extract insights from a single chunk ---
 async function extractFromChunk(
   chunkId: string,
@@ -25,29 +66,16 @@ async function extractFromChunk(
 ): Promise<Insight[]> {
   const userPrompt = buildUserPrompt(chunkText);
 
-  // Call Groq (Llama 3.3 70B)
-  const stream = await openrouter.chat.send({
-    chatRequest: {
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.1,
-      stream: true
-    }
-  });
-
-  let responseText = "";
-  for await (const chunk of stream as any) {
-    const content = chunk.choices[0]?.delta?.content;
-    if (content) {
-      responseText += content;
-      process.stdout.write(content);
-    }
-    if (chunk.usage) {
-      console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
-    }
+  // Call AI with retry logic
+  let responseText: string;
+  try {
+    responseText = await callAIWithRetry([
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: userPrompt },
+    ]);
+  } catch (err: any) {
+    console.warn(`⚠️  All retries failed for chunk ${chunkId}: ${err.message}`);
+    return [];
   }
 
   // Parse the JSON response
@@ -127,7 +155,7 @@ export async function extract(projectId: string): Promise<ExtractResult> {
 
     // Small delay to be polite to the API (Groq free tier is 30 req/min)
     if (i > 0) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
 
     // Call Groq to extract insights from this chunk

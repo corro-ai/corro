@@ -129,50 +129,71 @@ export async function cluster(projectId: string): Promise<{ totalThemes: number;
       const statements = group.insights.map((ins) => `- [${ins.kind}] ${ins.statement}`).join("\n");
       const avgSeverity = group.insights.reduce((sum, ins) => sum + (ins.severity || 5), 0) / group.insights.length;
   
-      console.log(`  🏷️  Cluster ${i + 1} (${group.insights.length} insights, avg severity ${avgSeverity.toFixed(1)}):`);
+      console.log(`  🏷️  Cluster ${i + 1}/${clustered.length} (${group.insights.length} insights, avg severity ${avgSeverity.toFixed(1)}):`);
   
-      // Ask Groq to name this cluster
-      const stream = await openrouter.chat.send({
-        chatRequest: {
-          model: "nvidia/nemotron-3-ultra-550b-a55b:free",
-          temperature: 0.3,
-          messages: [
-            {
-              role: "system",
-              content: "You are a UX researcher. Name this cluster of insights. Return ONLY JSON like {\"label\": \"string\", \"description\": \"string\"}. Keep label under 5 words, description under 15 words."
-            },
-            {
-              role: "user",
-              content: JSON.stringify(group.insights.map(i => i.statement))
-            }
-          ],
-          stream: true
-        }
-      });
-      
-      let responseContent = "";
-      for await (const chunk of stream as any) {
-        const content = chunk.choices[0]?.delta?.content;
-        if (content) {
-          responseContent += content;
-          process.stdout.write(content);
-        }
-        if (chunk.usage) {
-          console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
-        }
+      // Add delay between cluster labeling calls to avoid rate limits
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
-      const response = { choices: [{ message: { content: responseContent } }] };
-  
-      const content = response.choices[0]?.message?.content || "{}";
+
+      // Ask LLM to name this cluster with retry logic
       let label = "Unlabeled Theme";
       let description = "";
-  
+
       try {
-        const parsed = JSON.parse(content);
-        label = parsed.label || label;
-        description = parsed.description || "";
-      } catch {
-        console.log(`    ⚠️  Failed to parse LLM response, using default label`);
+        let responseContent = "";
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const stream = await openrouter.chat.send({
+              chatRequest: {
+                model: "thinkingmachines/inkling:free",
+                temperature: 0.3,
+                messages: [
+                  {
+                    role: "system",
+                    content: "You are a UX researcher. Name this cluster of insights. Return ONLY JSON like {\"label\": \"string\", \"description\": \"string\"}. Keep label under 5 words, description under 15 words."
+                  },
+                  {
+                    role: "user",
+                    content: JSON.stringify(group.insights.map(i => i.statement))
+                  }
+                ],
+                stream: true
+              }
+            });
+            
+            responseContent = "";
+            for await (const chunk of stream as any) {
+              const content = chunk.choices?.[0]?.delta?.content;
+              if (content) {
+                responseContent += content;
+              }
+              if (chunk.usage) {
+                console.log("\nReasoning tokens:", chunk.usage.completionTokensDetails?.reasoningTokens);
+              }
+            }
+
+            if (!responseContent || responseContent.trim() === "") {
+              throw new Error("AI returned empty response");
+            }
+            break; // Success, exit retry loop
+          } catch (err: any) {
+            const waitTime = Math.pow(2, attempt) * 1000;
+            console.warn(`    ⚠️  Attempt ${attempt}/3 failed: ${err.message}. Retrying in ${waitTime / 1000}s...`);
+            if (attempt === 3) throw err;
+            await new Promise(r => setTimeout(r, waitTime));
+          }
+        }
+
+        const cleanText = responseContent.replace(/```json/g, "").replace(/```/g, "").trim();
+        const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          label = parsed.label || label;
+          description = parsed.description || "";
+        }
+      } catch (err: any) {
+        console.log(`    ⚠️  All retries failed for cluster ${i + 1}, using default label`);
       }
   
       console.log(`    → "${label}"`);

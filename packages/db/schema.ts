@@ -112,6 +112,7 @@ export const opportunityEvidence = pgTable('opportunity_evidence', {
 export const featureBriefs = pgTable('feature_briefs', {
   id: uuid('id').primaryKey().defaultRandom(),
   opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
+  version: integer('version').notNull().default(1),
   contentMd: text('content_md').notNull(),
   generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
 });

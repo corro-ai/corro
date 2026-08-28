@@ -3,7 +3,7 @@ import { use, useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import { ArrowLeft, Quote, BarChart2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Quote, BarChart2, AlertCircle, Edit3, Save, X } from "lucide-react";
 
 export default function FeatureBriefViewer({ params }: { params: Promise<{ opportunityId: string, projectId: string }> }) {
   const { opportunityId, projectId } = use(params);
@@ -12,6 +12,10 @@ export default function FeatureBriefViewer({ params }: { params: Promise<{ oppor
   const [metrics, setMetrics] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState ("");
+  const [isSaving, setIsSaving] = useState(false);
+
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,13 +35,17 @@ export default function FeatureBriefViewer({ params }: { params: Promise<{ oppor
       .single();
     if (oppData) setOpportunity(oppData);
 
-    // 2. Fetch the Generated Brief
+    // 2. Fetch the Generated Brief (Latest Version)
     const { data: briefData } = await supabase
       .from("feature_briefs")
       .select("*")
       .eq("opportunity_id", opportunityId)
-      .single();
-    if (briefData) setBrief(briefData);
+      .order("version", { ascending: false })
+      .limit(1);
+      
+    if (briefData && briefData.length > 0) {
+      setBrief(briefData[0]);
+    }
 
     // 3. Fetch the Evidence Glue
     const { data: evidence } = await supabase
@@ -62,6 +70,31 @@ export default function FeatureBriefViewer({ params }: { params: Promise<{ oppor
     }
     
     setLoading(false);
+  }
+
+  async function handleSave() {
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/project/save-brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opportunityId,
+          contentMd: editContent
+        })
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      // Refetch data to get the new version, then exit edit mode
+      await fetchData();
+      setIsEditing(false);
+    } catch (err) {
+      alert("Failed to save the brief. Check console.");
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   if (loading) {
@@ -94,18 +127,61 @@ export default function FeatureBriefViewer({ params }: { params: Promise<{ oppor
             <p className="text-xs text-zinc-500">{opportunity?.title}</p>
           </div>
         </div>
-        <div className="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1.5 rounded-full font-medium border border-indigo-500/20">
-          Live Contract
+        <div className="flex items-center gap-3">
+          {isEditing ? (
+            <>
+              <button 
+                onClick={() => setIsEditing(false)}
+                className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white px-3 py-1.5 transition-colors"
+                disabled={isSaving}
+              >
+                <X size={14} /> Cancel
+              </button>
+              <button 
+                onClick={handleSave}
+                className="flex items-center gap-2 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-md font-medium transition-colors"
+                disabled={isSaving}
+              >
+                <Save size={14} /> {isSaving ? "Saving..." : "Save New Version"}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="text-xs text-zinc-500 font-medium px-3 py-1.5">
+                Version {brief.version}
+              </div>
+              <button 
+                onClick={() => {
+                  setEditContent(brief.content_md);
+                  setIsEditing(true);
+                }}
+                className="flex items-center gap-2 text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded-md font-medium transition-colors"
+              >
+                <Edit3 size={14} /> Edit Brief
+              </button>
+            </>
+          )}
         </div>
       </header>
 
       {/* Dual Pane Layout */}
       <div className="flex flex-1 overflow-hidden">
         
-        {/* LEFT PANE: The Spec (Markdown) */}
+        {/* LEFT PANE: The Spec (Markdown or Editor) */}
         <main className="flex-1 overflow-y-auto p-8 border-r border-zinc-800 bg-zinc-950/30">
-          <div className="max-w-3xl mx-auto prose prose-invert prose-headings:text-white prose-a:text-indigo-400">
-            <ReactMarkdown>{brief.content_md}</ReactMarkdown>
+          <div className="max-w-3xl mx-auto h-full">
+            {isEditing ? (
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full h-full min-h-[70vh] bg-transparent text-zinc-300 font-mono text-sm leading-relaxed p-4 border border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500/50 resize-none placeholder:text-zinc-700"
+                placeholder="Write your feature brief here using Markdown..."
+              />
+            ) : (
+              <div className="prose prose-invert prose-headings:text-white prose-a:text-indigo-400">
+                <ReactMarkdown>{brief.content_md}</ReactMarkdown>
+              </div>
+            )}
           </div>
         </main>
 

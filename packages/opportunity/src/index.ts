@@ -59,7 +59,7 @@ export async function scoreOpportunities(projectId: string) {
 
   const stream = await openrouter.chat.send({
     chatRequest: {
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+      model: "nvidia/nemotron-3.5-lightning:free",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.1,
       stream: true
