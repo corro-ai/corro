@@ -1,33 +1,27 @@
-// Dynamic import — @xenova/transformers is only loaded when embed() is called,
-// NOT when the /api/inngest route cold-starts. This prevents Vercel from crashing.
-let embedder: any = null;
+// Use Hugging Face's Inference API for embeddings instead of local onnxruntime.
+// Model: BAAI/bge-small-en-v1.5 (384-dim, same as previous all-MiniLM-L6-v2)
+// This works on Vercel because it's just an HTTP call — no native binaries needed.
 
-async function getEmbedder() {
-  if (!embedder) {
-    console.log("⏳ Loading embedding model (first time only)...");
-
-    // Dynamic import: this is the key fix for Vercel
-    const { pipeline, env } = await import("@xenova/transformers");
-
-    // Disable local filesystem access for Vercel Serverless
-    env.allowLocalModels = false;
-    env.useBrowserCache = false;
-
-    embedder = await pipeline(
-      "feature-extraction",
-      "Xenova/all-MiniLM-L6-v2"
-    );
-    console.log("✅ Embedding model loaded!");
-  }
-  return embedder;
-}
+const HF_API_URL =
+  "https://router.huggingface.co/hf-inference/models/BAAI/bge-small-en-v1.5";
 
 export async function embed(text: string): Promise<number[]> {
-  const extractor = await getEmbedder();
-  const output = await extractor(text, {
-    pooling: "mean",
-    normalize: true,
+  const response = await fetch(HF_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.HF_TOKEN}`,
+    },
+    body: JSON.stringify({ inputs: text }),
   });
-  // output.data is a Float32Array, convert to regular array
-  return Array.from(output.data as Float32Array);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Embedding API failed (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+
+  // API returns a flat array [0.1, 0.2, ...] for single input
+  return result as number[];
 }
