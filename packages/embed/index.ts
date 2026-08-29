@@ -1,35 +1,32 @@
-import { pipeline, env } from "@xenova/transformers";
 import { EmbeddingResult } from "./type";
 
-// Configure Transformers.js to not use local cache if it causes issues, 
-// though by default it caches models in `./node_modules/.cache/`
-env.allowLocalModels = false;
-env.useBrowserCache = false;
+// Use Hugging Face's Inference API for embeddings instead of local onnxruntime.
+// Model: BAAI/bge-small-en-v1.5 (384-dim, same as previous all-MiniLM-L6-v2)
 
-// Singleton to ensure we only load the model into memory once
-let embedderPipeline: any = null;
-
-async function getEmbedder() {
-  if (!embedderPipeline) {
-    // This will download the model on the very first run (approx 80MB)
-    embedderPipeline = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
-  }
-  return embedderPipeline;
-}
+const HF_API_URL = "https://router.huggingface.co/hf-inference/models/BAAI/bge-small-en-v1.5";
 
 // --- Generate embedding for a single chunk of text ---
 export async function embed(text: string): Promise<EmbeddingResult> {
-  const embedder = await getEmbedder();
-  
-  // Generate the embeddings
-  const output = await embedder(text, { pooling: 'mean', normalize: true });
-  
-  // Convert the Float32Array to a standard JavaScript Array
-  const embedding = Array.from(output.data);
+  const response = await fetch(HF_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.HF_TOKEN}`,
+    },
+    body: JSON.stringify({ inputs: text }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Embedding API failed (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  const embedding = result as number[];
 
   return {
     text,
-    embedding: embedding as number[],
+    embedding,
   };
 }
 

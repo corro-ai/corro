@@ -1,12 +1,10 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { OpenRouter } from "@openrouter/sdk";
-import * as dotenv from "dotenv";
 import * as path from "path";
 import { embed } from "./embed";
 
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 
 const supabase = createClient(

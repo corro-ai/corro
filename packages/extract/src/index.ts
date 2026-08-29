@@ -1,13 +1,11 @@
 import { OpenRouter } from "@openrouter/sdk";
 import { createClient } from "@supabase/supabase-js";
-import * as dotenv from "dotenv";
 import { Insight, InsightKind, ExtractResult } from "./types";
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompt";
 
 import * as path from "path";
 
 // Load environment variables from root .env
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Initialize Groq
 const openrouter = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
