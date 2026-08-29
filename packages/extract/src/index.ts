@@ -22,7 +22,7 @@ async function callAIWithRetry(messages: any[], maxRetries = 3): Promise<string>
     try {
       const stream = await openrouter.chat.send({
         chatRequest: {
-          model: "thinkingmachines/inkling:free",
+          model: "google/gemma-4-31b-it:free",
           messages,
           temperature: 0.1,
           stream: true

@@ -155,7 +155,7 @@ export async function synthesize(projectId: string): Promise<string> {
         try {
           const stream = await openrouter.chat.send({
             chatRequest: {
-              model: "thinkingmachines/inkling:free",
+              model: "google/gemma-4-31b-it:free",
               temperature: 0.4,
               messages: [
                 {

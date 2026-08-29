@@ -144,7 +144,7 @@ export async function cluster(projectId: string): Promise<{ totalThemes: number;
           try {
             const stream = await openrouter.chat.send({
               chatRequest: {
-                model: "thinkingmachines/inkling:free",
+                model: "google/gemma-4-31b-it:free",
                 temperature: 0.3,
                 messages: [
                   {
