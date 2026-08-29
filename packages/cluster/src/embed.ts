@@ -1,4 +1,8 @@
-import { pipeline, Pipeline } from "@xenova/transformers";
+import { pipeline, env } from "@xenova/transformers";
+
+// Disable local models for Vercel Serverless environment
+env.allowLocalModels = false;
+env.useBrowserCache = false;
 
 
 // Change from `Pipeline` to `any` to bypass the type error
