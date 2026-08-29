@@ -7,29 +7,39 @@ import { IngestResult, DialogueTurn } from "./types";
 // It contains timestamps and speaker names already.
 function parseVTT(content: string, filename: string): IngestResult {
   const turns: DialogueTurn[] = [];
-  const blocks = content.split("\n\n").filter(Boolean);
+  const blocks = content.split(/\n\n+/).filter(Boolean);
 
   for (const block of blocks) {
+    if (block.trim() === "WEBVTT") continue;
+
     const lines = block.trim().split("\n");
-    // A valid block looks like:
-    // 1
-    // 00:00:01.000 --> 00:00:05.000
-    // Speaker Name: What they said
-    if (lines.length < 3) continue;
+    
+    // 1. Find the anchor: the timing line
+    const timeLineIndex = lines.findIndex((l) => l.includes("-->"));
+    if (timeLineIndex === -1) continue;
 
-    const timeLine = lines.find((l) => l.includes("-->"));
-    if (!timeLine) continue;
-
+    // 2. Parse timestamps
+    const timeLine = lines[timeLineIndex];
     const [startStr, endStr] = timeLine.split("-->").map((s) => s.trim());
-    const textLine = lines[lines.length - 1];
 
-    const colonIndex = textLine.indexOf(":");
-    const speaker =
-      colonIndex > -1 ? textLine.substring(0, colonIndex).trim() : "Unknown";
-    const text =
-      colonIndex > -1
-        ? textLine.substring(colonIndex + 1).trim()
-        : textLine.trim();
+    // 3. Extract all text *after* the timing line
+    let rawText = lines.slice(timeLineIndex + 1).join(" ").trim();
+    
+    // 4. Extract speaker using Regex for <v Name> or Name:
+    let speaker = "Unknown";
+    let text = rawText;
+
+    const voiceTagMatch = rawText.match(/^<v\s+([^>]+)>(.*)/i);
+    if (voiceTagMatch) {
+      speaker = voiceTagMatch[1].trim();
+      text = voiceTagMatch[2].trim();
+    } else {
+      const colonIndex = rawText.indexOf(":");
+      if (colonIndex > -1 && colonIndex < 30) {
+        speaker = rawText.substring(0, colonIndex).trim();
+        text = rawText.substring(colonIndex + 1).trim();
+      }
+    }
 
     turns.push({
       speaker,
