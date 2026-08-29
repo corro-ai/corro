@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['onnxruntime-node'],
+  serverExternalPackages: ['onnxruntime-node', '@xenova/transformers'],
 };
 
 export default nextConfig;
